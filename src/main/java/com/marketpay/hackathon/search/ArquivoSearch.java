@@ -1,7 +1,5 @@
 package com.marketpay.hackathon.search;
 
-import java.util.Date;
-
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +11,7 @@ public class ArquivoSearch {
 	
 	private String nome;
 	
-	private Date dataCriacao;	
+	private String dataCriacao;	
 	
 
 }

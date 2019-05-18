@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
 import com.marketpay.hackathon.model.ArquivoFTP;
 import com.marketpay.hackathon.search.ArquivoSearch;
 import com.marketpay.hackathon.service.ArquivoService;

@@ -1,10 +1,8 @@
 package com.marketpay.hackathon.config;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Vector;
@@ -14,8 +12,6 @@ import com.jcraft.jsch.ChannelSftp.LsEntry;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
-import com.jcraft.jsch.SftpException;
-import com.marketpay.hackathon.exception.FTPException;
 import com.marketpay.hackathon.model.ArquivoFTP;
 import com.marketpay.hackathon.search.ArquivoSearch;
 
@@ -49,8 +45,6 @@ public class ConfigSFTP {
 	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws Exception {
 		List<ArquivoFTP> list = new ArrayList<ArquivoFTP>();
 
-		SimpleDateFormat format = new SimpleDateFormat(
-				"EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
 		try {			
 			if (this.session != null && this.session.isConnected()) {
 
@@ -76,20 +70,25 @@ public class ConfigSFTP {
 					
 					for (LsEntry arq : files){
 						ArquivoFTP arquivoFTP = new ArquivoFTP();
-						Date dataCriacao = (Date) format.parse(arq.getAttrs().getMtimeString());
+						
+						String dataCriacao = arq.getAttrs().getMtimeString();
+						dataCriacao = new SimpleDateFormat("dd/MM/yyyy")
+					              .format(new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US).parse(dataCriacao));
+						System.out.println(dataCriacao);
+						
 						
 						if(porData && porNome) {							
 							if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome()) && dataCriacao.equals(arquivoSearch.getDataCriacao())){
-								preencherListaArquivos(list, arq, arquivoFTP, format);
+								preencherListaArquivos(list, arq, arquivoFTP);
 							}
 						}else {
 							if(porNome) {
 								if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome())){
-									preencherListaArquivos(list, arq, arquivoFTP, format);
-								}else {
-									if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && dataCriacao.equals(arquivoSearch.getDataCriacao())){
-										preencherListaArquivos(list, arq, arquivoFTP, format);
-									}
+									preencherListaArquivos(list, arq, arquivoFTP);
+								}
+							}else {
+								if (porData && !arq.getFilename().equals(".") && !arq.getFilename().equals("..") && dataCriacao.equals(arquivoSearch.getDataCriacao())){
+									preencherListaArquivos(list, arq, arquivoFTP);
 								}
 							}
 						}						
@@ -111,42 +110,19 @@ public class ConfigSFTP {
 		return list;
 	}
 
-	private void preencherListaArquivos(List<ArquivoFTP> list, LsEntry arq, ArquivoFTP arquivoFTP, SimpleDateFormat format)
+	private void preencherListaArquivos(List<ArquivoFTP> list, LsEntry arq, ArquivoFTP arquivoFTP)
 			throws ParseException {
 		arquivoFTP.setNome(arq.getFilename());	
 
-		Date dataCriacao = (Date) format.parse(arq.getAttrs().getMtimeString());
-
+		String dataCriacao = arq.getAttrs().getMtimeString();
+		dataCriacao = new SimpleDateFormat("dd/MM/yyyy")
+	              .format(new SimpleDateFormat("EEE MMM d HH:mm:ss zzz yyyy", Locale.US).parse(dataCriacao));
+		
 		arquivoFTP.setDataCriacao(dataCriacao);
 		list.add(arquivoFTP);
 	}
 
-	public final void addFile(String ftpPath, String filePath,
-			String fileName) throws IllegalAccessException, IOException,
-	SftpException, JSchException {
-		if (this.session != null && this.session.isConnected()) {
-
-			// Abrimos un canal SFTP. Es como abrir una consola.
-			ChannelSftp channelSftp = (ChannelSftp) this.session.
-					openChannel("sftp");
-
-			// Nos ubicamos en el directorio del FTP.
-			channelSftp.cd(ftpPath);
-			channelSftp.connect();
-
-			System.out.println(String.format("Creando archivo %s en el " +
-					"directorio %s", fileName, ftpPath));
-			channelSftp.put(filePath, fileName);
-
-			System.out.println("Archivo subido exitosamente");
-
-			channelSftp.exit();
-			channelSftp.disconnect();
-		} else {
-			throw new IllegalAccessException("No existe sesion SFTP iniciada.");
-		}
-	}
-
+	
 	public final void disconnect() {
 		this.session.disconnect();
 	}
