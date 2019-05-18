@@ -26,7 +26,7 @@ public class ArquivoController {
 
 	@ApiOperation(value = "Listagem de arquivos", response = ArquivoFTP.class)
 	@RequestMapping(value = "/listarArquivos", method= RequestMethod.POST, produces = APPLICATION_JSON )
-	public List<ArquivoFTP> listarAquivos(ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
+	public List<ArquivoFTP> listarAquivos(ArquivoSearch arquivoSearch) throws Exception {
 		return arquivoService.listarArquivo(arquivoSearch);
 	}
 

@@ -46,7 +46,7 @@ public class ConfigSFTP {
 		}
 	} 
 
-	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
+	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws Exception {
 		List<ArquivoFTP> list = new ArrayList<ArquivoFTP>();
 
 		SimpleDateFormat format = new SimpleDateFormat(
@@ -98,7 +98,7 @@ public class ConfigSFTP {
 					channelSftp.exit();
 					channelSftp.disconnect();	
 				}else {
-					new FTPException("Pelo menos um campo de pesquisa deve ser preenchido.");
+					throw new Exception("Pelo menos um campo de pesquisa deve ser preenchido.");
 				}
 			} 
 			else {
@@ -106,7 +106,7 @@ public class ConfigSFTP {
 			}
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw e;
 		}
 		return list;
 	}
