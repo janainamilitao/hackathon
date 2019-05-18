@@ -10,5 +10,7 @@ public class ArquivoFTP {
 	private String nome;
 	
 	private String dataCriacao;
+	
+	private String tamanho;
 
 }
