@@ -21,7 +21,7 @@ public class ConfigSFTP {
 		            this.session = jsch.getSession(username, host, port);
 		            this.session.setPassword(password);
 		 
-		            // Parametro para no validar key de conexion.
+		            // Parametro para no validar key de conexão.
 		            this.session.setConfig("StrictHostKeyChecking", "no");
 		 
 		            this.session.connect();
