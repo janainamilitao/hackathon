@@ -15,6 +15,7 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import com.marketpay.hackathon.model.ArquivoFTP;
+import com.marketpay.hackathon.search.ArquivoSearch;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -43,16 +44,13 @@ public class ConfigSFTP {
 		}
 	} 
 
-	public final List<ArquivoFTP> listFile(String ftpPath) throws IllegalAccessException, JSchException, SftpException {
+	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
 		List<ArquivoFTP> list = new ArrayList<ArquivoFTP>();
 
 		try {			
 			if (this.session != null && this.session.isConnected()) {
 
 				ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
-
-
-
 
 				channelSftp.connect();
 				channelSftp.cd(ftpPath);
@@ -61,7 +59,7 @@ public class ConfigSFTP {
 
 				for (LsEntry arq : files)
 				{
-					if (!arq.getFilename().equals(".") && !arq.getFilename().equals(".."))
+					if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome()))
 					{
 
 						ArquivoFTP arquivoFTP = new ArquivoFTP();

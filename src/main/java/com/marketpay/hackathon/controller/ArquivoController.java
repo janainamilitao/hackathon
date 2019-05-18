@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.marketpay.hackathon.model.ArquivoFTP;
+import com.marketpay.hackathon.search.ArquivoSearch;
 import com.marketpay.hackathon.service.ArquivoService;
 
 import io.swagger.annotations.ApiOperation;
@@ -25,8 +26,8 @@ public class ArquivoController {
 
 	@ApiOperation(value = "Listagem de arquivos", response = ArquivoFTP.class)
 	@RequestMapping(value = "/listarArquivos", method= RequestMethod.POST, produces = APPLICATION_JSON )
-	public List<ArquivoFTP> listarAquivos() throws IllegalAccessException, JSchException, SftpException {
-		return arquivoService.listarArquivo();
+	public List<ArquivoFTP> listarAquivos(ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
+		return arquivoService.listarArquivo(arquivoSearch);
 	}
 
 }
