@@ -25,8 +25,6 @@ public class UsuarioController {
 	@RequestMapping(value = "/criarUsuario", method= RequestMethod.POST, produces = APPLICATION_JSON )
 	public Usuario criarUsuario(@RequestBody UsuarioDTO usuarioDTO) {
 		return usuarioService.criarUsuario(usuarioDTO);
-	}
-	
-	
+	}	
 
 }
