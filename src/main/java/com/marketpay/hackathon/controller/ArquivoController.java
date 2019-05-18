@@ -27,5 +27,4 @@ public class ArquivoController {
 	public List<ArquivoFTP> listarAquivos(ArquivoSearch arquivoSearch) throws Exception {
 		return arquivoService.listarArquivo(arquivoSearch);
 	}
-
 }

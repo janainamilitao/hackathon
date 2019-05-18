@@ -27,7 +27,8 @@ public class ConfigSFTP {
 	
 	private Session session;
 
-	public void connect(String username, String password, String host, int port)
+	/**Conexão com sft*/
+	public void conexao(String username, String password, String host, int port)
 			throws JSchException, IllegalAccessException {
 		if (this.session == null || !this.session.isConnected()) {
 			JSch jsch = new JSch();
@@ -44,7 +45,7 @@ public class ConfigSFTP {
 		}
 	} 
 
-	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws Exception {
+	public final List<ArquivoFTP> listagemArquivo(String ftpPath, ArquivoSearch arquivoSearch) throws Exception {
 		List<ArquivoFTP> list = new ArrayList<ArquivoFTP>();
 
 		try {			
@@ -111,9 +112,7 @@ public class ConfigSFTP {
 
 		} catch (Exception e) {
 			throw e;
-		}
-		
-		
+		}		
 		
 		return list;
 	}
@@ -132,7 +131,7 @@ public class ConfigSFTP {
 	}
 
 	
-	public final void disconnect() {
+	public final void disconectar() {
 		this.session.disconnect();
 	}
 	
