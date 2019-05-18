@@ -17,7 +17,7 @@ public class SFTPConexao {
 	private static final String PASSWORD = "mptechday@2019*";
 	private static final String PATH_FTP = "/mptechday/spc/janaina_jussara/in/";
 
-	public List<ArquivoFTP> consultarArquivos(ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
+	public List<ArquivoFTP> consultarArquivos(ArquivoSearch arquivoSearch) throws Exception {
 
 		ConfigSFTP sshConnector = new ConfigSFTP();
 		sshConnector.connect(USERNAME, PASSWORD, HOST, PORT);
@@ -26,11 +26,4 @@ public class SFTPConexao {
 		
 		return arquivos;
 	}
-	
-	/*
-	 * public static void main (String[] args) throws IllegalAccessException,
-	 * JSchException, SftpException { SFTPConexao conexao = new SFTPConexao();
-	 * conexao.consultarArquivos(); }
-	 */
-
 }
