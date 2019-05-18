@@ -1,6 +1,7 @@
 package com.marketpay.hackathon.config;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -14,6 +15,7 @@ import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
+import com.marketpay.hackathon.exception.FTPException;
 import com.marketpay.hackathon.model.ArquivoFTP;
 import com.marketpay.hackathon.search.ArquivoSearch;
 
@@ -47,39 +49,57 @@ public class ConfigSFTP {
 	public final List<ArquivoFTP> listFile(String ftpPath, ArquivoSearch arquivoSearch) throws IllegalAccessException, JSchException, SftpException {
 		List<ArquivoFTP> list = new ArrayList<ArquivoFTP>();
 
+		SimpleDateFormat format = new SimpleDateFormat(
+				"EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
 		try {			
 			if (this.session != null && this.session.isConnected()) {
 
 				ChannelSftp channelSftp = (ChannelSftp) this.session.openChannel("sftp");
 
-				channelSftp.connect();
-				channelSftp.cd(ftpPath);
+				boolean porData = false;
+				boolean porNome = false;
 
-				Vector<LsEntry> files = channelSftp.ls("*");
-
-				for (LsEntry arq : files)
-				{
-					if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome()))
-					{
-
-						ArquivoFTP arquivoFTP = new ArquivoFTP();
-						arquivoFTP.setNome(arq.getFilename());	
-
-						SimpleDateFormat format = new SimpleDateFormat(
-								"EEE MMM dd HH:mm:ss zzz yyyy", Locale.US);
-						Date dataCriacao = (Date) format.parse(arq.getAttrs().getMtimeString());
-						System.out.println("Mod Date:"+dataCriacao);
-						
-						arquivoFTP.setDataCriacao(dataCriacao);
-						list.add(arquivoFTP);
-					}
+				if(arquivoSearch.getNome()!=null && !arquivoSearch.getNome().equals("")) {
+					porNome = true;
 				}
 
-				System.out.println(list);
+				if(arquivoSearch.getDataCriacao()!=null) {
+					porData = true;
+				}
 
-				channelSftp.exit();
-				channelSftp.disconnect();				
+				if(porNome || porData) {
 
+					channelSftp.connect();
+					channelSftp.cd(ftpPath);
+
+					Vector<LsEntry> files = channelSftp.ls("*");
+					
+					for (LsEntry arq : files){
+						ArquivoFTP arquivoFTP = new ArquivoFTP();
+						Date dataCriacao = (Date) format.parse(arq.getAttrs().getMtimeString());
+						
+						if(porData && porNome) {							
+							if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome()) && dataCriacao.equals(arquivoSearch.getDataCriacao())){
+								preencherListaArquivos(list, arq, arquivoFTP, format);
+							}
+						}else {
+							if(porNome) {
+								if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && arq.getFilename().contains(arquivoSearch.getNome())){
+									preencherListaArquivos(list, arq, arquivoFTP, format);
+								}else {
+									if (!arq.getFilename().equals(".") && !arq.getFilename().equals("..") && dataCriacao.equals(arquivoSearch.getDataCriacao())){
+										preencherListaArquivos(list, arq, arquivoFTP, format);
+									}
+								}
+							}
+						}						
+					}
+					
+					channelSftp.exit();
+					channelSftp.disconnect();	
+				}else {
+					new FTPException("Pelo menos um campo de pesquisa deve ser preenchido.");
+				}
 			} 
 			else {
 				throw new IllegalAccessException("Não existe sessão SFTP iniciada.");
@@ -89,6 +109,16 @@ public class ConfigSFTP {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	private void preencherListaArquivos(List<ArquivoFTP> list, LsEntry arq, ArquivoFTP arquivoFTP, SimpleDateFormat format)
+			throws ParseException {
+		arquivoFTP.setNome(arq.getFilename());	
+
+		Date dataCriacao = (Date) format.parse(arq.getAttrs().getMtimeString());
+
+		arquivoFTP.setDataCriacao(dataCriacao);
+		list.add(arquivoFTP);
 	}
 
 	public final void addFile(String ftpPath, String filePath,
